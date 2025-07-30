@@ -20,5 +20,9 @@ class Player(BaseModel):
     last_name = models.CharField(max_length=50)
     contact_phone = models.CharField(max_length=25)
     contact_email = models.CharField(max_length=50)
-    team = models.ForeignKey(Team, on_delete=models.PROTECT)
+    team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="team_players")
     date_of_birth = models.DateField()
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
