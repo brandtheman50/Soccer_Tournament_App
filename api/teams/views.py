@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .serializers import *
 
 class RegisterTeam(APIView):
-    def post(request):
+    def post(self, request):
         try:
             data = request.data
             serializer = TeamSerializer(data=data)
@@ -16,7 +16,7 @@ class RegisterTeam(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
 class RegisterPlayer(APIView):
-    def post(request):
+    def post(self, request):
         try:
             data = request.data
             serializer = PlayerSerializer(data=data)
@@ -28,7 +28,7 @@ class RegisterPlayer(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class GetTeam(APIView):
-    def get(request, team_id):
+    def get(self, request, team_id):
         try:
             team = Team.objects.filter(id=team_id).prefetch_related("team_players").first()
             serializer = OutputTeamSerializer(team)
@@ -38,7 +38,7 @@ class GetTeam(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class GetPlayer(APIView):
-    def get(request, player_id):
+    def get(self, request, player_id):
         try:
             player = Player.objects.filter(id=player_id).select_related("team").first()
             serializer = PlayerSerializer(player)
