@@ -11,7 +11,8 @@ class BaseModel(models.Model):
 
 class Team(BaseModel):
     name = models.CharField(max_length=100)
-    coach_name = models.CharField(max_length=100)
+    coach_first_name = models.CharField(max_length=50)
+    coach_last_name = models.CharField(max_length=50)
     contact_phone = models.CharField(max_length=25)
     contact_email = models.CharField(max_length=50)
 

@@ -3,7 +3,8 @@ from .models import *
 
 class TeamSerializer(serializers.Serializer):
     name = serializers.CharField()
-    coach_name = serializers.CharField()
+    coach_first_name = serializers.CharField()
+    coach_last_name = serializers.CharField()
     contact_phone = serializers.CharField()
     contact_email = serializers.CharField()
 
