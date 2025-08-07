@@ -1,28 +1,19 @@
 from rest_framework import serializers
 from .models import *
 
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from .models import Team, TeamMembership
+
+User = get_user_model()
+
 class TeamSerializer(serializers.Serializer):
     name = serializers.CharField()
-    coach_first_name = serializers.CharField()
-    coach_last_name = serializers.CharField()
-    contact_phone = serializers.CharField()
-    contact_email = serializers.CharField()
 
-class PlayerSerializer(serializers.Serializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    contact_phone = serializers.CharField()
-    contact_email = serializers.CharField()
-    team = serializers.IntegerField()
-    date_of_birth = serializers.DateField()
+    def validate(self, data):
+        if Team.objects.filter(name=data["name"]).exists():
+            raise serializers.ValidationError("Team with provided name already exists.")
+        return data  # ✅ this is required
 
-class OutputPlayerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Player
-        fields = '__all__'
-
-class OutputTeamSerializer(serializers.ModelSerializer):
-    team_players = OutputPlayerSerializer(many=True)
-    class Meta:
-        model = Team
-        fields = '__all__'
+    def create(self, validated_data):
+        return Team.objects.create(**validated_data)
