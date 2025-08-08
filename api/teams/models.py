@@ -26,13 +26,24 @@ class PlayerProfile(BaseModel):
 
 class TeamMembership(BaseModel):
     ROLE_CHOICES = (
-        ('coach', 'Coach'),
+        ('admin', 'Admin'),
         ('player', 'Player'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    )
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="team_users")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_membership")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+
+    # Renamed property easier read
+    @property 
+    def joined_at(self):
+        return self.created_at
+    
     class Meta:
         unique_together = ('user', 'team')  # optional

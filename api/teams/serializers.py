@@ -3,7 +3,9 @@ from .models import *
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Team, TeamMembership
+from .models import *
+
+from users.serializers import UserSerializerModel
 
 User = get_user_model()
 
@@ -17,3 +19,16 @@ class TeamSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Team.objects.create(**validated_data)
+
+class TeamMembershipSerializer(serializers.ModelSerializer):
+    user = UserSerializerModel()
+    class Meta:
+        model = TeamMembership
+        fields = ('user', 'role')
+
+class TeamSerializerModel(serializers.ModelSerializer):
+    team_membership = TeamMembershipSerializer(many=True)
+
+    class Meta:
+        model = Team
+        fields = ('name', 'team_membership')
