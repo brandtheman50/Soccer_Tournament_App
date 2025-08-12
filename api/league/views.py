@@ -5,8 +5,20 @@ from .models import Match
 
 from services.match_services import *
 from datetime import datetime
+from .serializers import *
 # Create your views here.
 
+class CreateMatch(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            serializer = MatchSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=200)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=400)
+        
 class UpdateMatch(APIView):
     @transaction.atomic
     def patch(self, request):
@@ -42,3 +54,19 @@ class UpdateMatch(APIView):
             return Response({"error": "Match not found"}, status=404)
         except Exception as e:
             return Response({"error": "Something went wrong"})
+
+class CreateLeague(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = LeagueSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "League created successfully."})
+
+class AddTeamToLeague(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = TeamStandingSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=200)

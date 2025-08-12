@@ -40,6 +40,9 @@ class Match(BaseModel):
     home_score = models.PositiveSmallIntegerField(null=True, blank=True)
     away_score = models.PositiveSmallIntegerField(null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.home_team.name} vs {self.away_team.name}"
+    
     def get_winner(self):
         if self.home_score > self.away_score:
             return self.home_team.name

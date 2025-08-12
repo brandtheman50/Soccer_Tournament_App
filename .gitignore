@@ -5,5 +5,7 @@ api/teams/__pycache__
 api/users/__pycache__
 api/teams/migrations/__pycache__
 api/users/migrations/__pycache__
+api/league/__pycache__
+api/league/migrations/__pycache__
 api/core/django/__pycache__
 api/.env
