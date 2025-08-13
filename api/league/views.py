@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from django.db import transaction
 from .models import Match
 
-from services.match_services import *
+from .services.match_services import *
 from datetime import datetime
 from .serializers import *
 from .permissions import IsLeagueAdmin
+
 # Create your views here.
 
 class CreateMatch(APIView, IsLeagueAdmin):
