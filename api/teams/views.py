@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -81,8 +82,7 @@ class GenerateQRCode(APIView):
             user = User.objects.get(id=player_id)
             
             # Verify user is assigned to team
-            if not TeamMembership.objects.filter(team=team, user=user).exists():
-                raise Exception("This user is not assigned to this team.")
+            TeamMembership.objects.get(team=team, user=user)
             
             # Data to encode in the QR code
             url = f"{API_HOSTNAME}/users/get-user/{user.id}"
@@ -113,6 +113,8 @@ class GenerateQRCode(APIView):
 
             return Response(status=status.HTTP_200_OK)
 
+        except TeamMembership.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
