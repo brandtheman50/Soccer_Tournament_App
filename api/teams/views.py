@@ -1,6 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+
+from django.core.mail import send_mail
+
 from .serializers import *
 
 class RegisterTeam(APIView):
@@ -43,6 +46,16 @@ class GetPlayer(APIView):
             player = Player.objects.filter(id=player_id).select_related("team").first()
             serializer = PlayerSerializer(player)
             return Response(serializer.data)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class GenerateQRCode(APIView):
+    def get(self, request, team_id, player_id):
+        try:
+            team = Team.objects.get(id=team_id)
+            player = Player.objects.get(id=player_id)
+            
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
