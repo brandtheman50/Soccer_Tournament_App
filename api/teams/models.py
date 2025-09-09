@@ -18,6 +18,7 @@ class Team(BaseModel):
 
 class PlayerProfile(BaseModel):
     date_of_birth = models.DateField()
+    profile_photo = models.CharField(null=True, blank=True, max_length=200)
 
     @property
     def full_name(self):

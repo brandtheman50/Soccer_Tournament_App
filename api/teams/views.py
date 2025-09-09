@@ -2,10 +2,21 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+from email.mime.image import MIMEImage
 
 from .serializers import *
 from .permissions import *
+
+import qrcode
+
+from io import BytesIO
+
+from core.env import API_HOSTNAME
+
+from users.models import User
 
 class RegisterTeam(APIView, BaseAuth):
     def post(self, request):
@@ -62,12 +73,46 @@ class AssignUserToTeam(APIView):
         except Exception as e:
             print(e)
             return Response({"error": "Something went wrong."}, status=status.HTTP_400_BAD_REQUEST)
+        
 class GenerateQRCode(APIView):
     def get(self, request, team_id, player_id):
         try:
             team = Team.objects.get(id=team_id)
-            player = PlayerProfile.objects.get(id=player_id)
+            user = User.objects.get(id=player_id)
             
+            # Verify user is assigned to team
+            if not TeamMembership.objects.filter(team=team, user=user).exists():
+                raise Exception("This user is not assigned to this team.")
+            
+            # Data to encode in the QR code
+            url = f"{API_HOSTNAME}/users/get-user/{user.id}"
+
+            # Generate the QR code
+            img = qrcode.make(url)
+            buf = BytesIO()
+            img.save(buf, format="PNG")
+            png_bytes = buf.getvalue()
+
+            # Render HTML template; reference the image by a CID
+            html = render_to_string("emails/qr_code_email.html", context={"qr_cid": "qr1"})
+
+            # Build email
+            subject = "Your QR Code"
+            text_fallback = "Your email client doesn't support HTML. The QR code is attached."
+            email = EmailMultiAlternatives(subject, text_fallback, to=[user.email])
+            email.attach_alternative(html, "text/html")
+
+            # Attach PNG inline with a matching CID
+            img_part = MIMEImage(png_bytes, _subtype="png")
+            img_part.add_header("Content-ID", "<qr1>")
+            img_part.add_header("Content-Disposition", "inline", filename="qr.png")
+            email.attach(img_part)
+
+            # 5) Send
+            email.send()
+
+            return Response(status=status.HTTP_200_OK)
+
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
