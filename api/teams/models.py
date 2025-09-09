@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 
 # Create your models here.
 
@@ -11,19 +12,38 @@ class BaseModel(models.Model):
 
 class Team(BaseModel):
     name = models.CharField(max_length=100)
-    coach_first_name = models.CharField(max_length=50)
-    coach_last_name = models.CharField(max_length=50)
-    contact_phone = models.CharField(max_length=25)
-    contact_email = models.CharField(max_length=50)
 
-class Player(BaseModel):
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    contact_phone = models.CharField(max_length=25)
-    contact_email = models.CharField(max_length=50)
-    team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="team_players")
+    def __str__(self):
+        return self.name
+
+class PlayerProfile(BaseModel):
     date_of_birth = models.DateField()
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+
+class TeamMembership(BaseModel):
+    ROLE_CHOICES = (
+        ('admin', 'Admin'),
+        ('player', 'Player'),
+    )
+
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="team_users")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_membership")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+
+    # Renamed property easier read
+    @property 
+    def joined_at(self):
+        return self.created_at
+    
+    class Meta:
+        unique_together = ('user', 'team')  # optional

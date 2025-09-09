@@ -15,7 +15,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'teams',
-    'rest_framework'
+    'league',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -80,8 +82,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'users.validators.UppercaseValidator',
+    },
+    {
+        'NAME': 'users.validators.SpecialCharValidator',
+    },
+    {
+        'NAME': 'users.validators.NumericPasswordValidator',
+    },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
