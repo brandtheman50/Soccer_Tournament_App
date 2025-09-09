@@ -66,7 +66,7 @@ class GenerateQRCode(APIView):
     def get(self, request, team_id, player_id):
         try:
             team = Team.objects.get(id=team_id)
-            player = Player.objects.get(id=player_id)
+            player = PlayerProfile.objects.get(id=player_id)
             
         except Exception as e:
             print(e)
