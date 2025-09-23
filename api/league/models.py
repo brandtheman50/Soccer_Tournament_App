@@ -4,7 +4,17 @@ from teams.models import Team, BaseModel
 # Create your models here.
 
 class League(BaseModel):
+    ACTIVE = "ACTIVE"
+    COMPLETE = "COMPLETE"
+    PLAYOFFS = "PLAYOFFS"
+    STATUS_OPTIONS = (
+        (ACTIVE, "Active"),
+        (COMPLETE, "Complete"),
+        (PLAYOFFS, "Playoffs")
+    )
+
     name = models.CharField(max_length=50)
+    status = models.CharField(max_length=10)
 
 class TeamStanding(BaseModel):
     team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="team_standings")
@@ -27,7 +37,12 @@ class TeamStanding(BaseModel):
         return self.goals_for - self.goals_against
     
     class Meta:
-        unique_together = ('team', 'league')
+        constraints = [
+            models.UniqueConstraint(
+                fields=["team", "league"],
+                name="uniq_team_per_league"
+            )
+        ]
 
 
 class Match(BaseModel):

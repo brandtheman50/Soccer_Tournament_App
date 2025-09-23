@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from django.db.models import Q
 
+from teams.models import PlayerProfile
+
 User = get_user_model()
 
 class UserSerializer(serializers.Serializer):
@@ -46,7 +48,15 @@ class UserSerializer(serializers.Serializer):
         # user.email = user.email.lower(); user.username = user.username.lower(); user.save(update_fields=["email","username"])
         return user
 
+class ProfileSerializerModel(serializers.ModelSerializer):
+    # Create function for getting user profile photo from storage
+    class Meta:
+        model = PlayerProfile
+        fields = '__all__'
+        
 class UserSerializerModel(serializers.ModelSerializer):
+    profile = ProfileSerializerModel
+
     class Meta:
         model = User
         fields = ('id', 'full_name', 'email', 'phone')
