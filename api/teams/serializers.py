@@ -1,5 +1,9 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
+
 from .models import *
+
+from league.models import League, TeamStanding
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -9,16 +13,38 @@ from users.serializers import UserSerializerModel
 
 User = get_user_model()
 
-class TeamSerializer(serializers.Serializer):
-    name = serializers.CharField()
+class TeamSerializer(serializers.ModelSerializer):
 
-    def validate(self, data):
-        if Team.objects.filter(name=data["name"]).exists():
-            raise serializers.ValidationError("Team with provided name already exists.")
-        return data  # ✅ this is required
+    class Meta:
+        model = Team
+        fields = ["id", "name"]
 
-    def create(self, validated_data):
-        return Team.objects.create(**validated_data)
+class PlayerProfileSerializer(serializers.ModelSerializer):
+    # Accept a team id on write, expose a nested or pk on read
+    team_id = serializers.PrimaryKeyRelatedField(
+        source="team", queryset=Team.objects.all(), write_only=True
+    )
+
+    # If you want to display the team pk back:
+    team = TeamSerializer(read_only=True)
+    
+    class Meta:
+        model = PlayerProfile
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "team", # read-only view of the relation
+            "team_id", # write-only input
+        ]
+        validators = [
+            UniqueTogetherValidator(
+                queryset=PlayerProfile.objects.all(),
+                fields=["team", "email"],
+                message="This email is already registered in this team."
+            )
+        ]
 
 class TeamMembershipSerializer(serializers.ModelSerializer):
     user = UserSerializerModel()
