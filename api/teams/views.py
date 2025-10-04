@@ -2,8 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
-
-from django.template.loader import render_to_string
+from .helpers import send_qr_email
 
 
 from .serializers import *
@@ -17,5 +16,9 @@ class RegisterPlayer(APIView):
 
         serializer = PlayerProfileSerializer(data)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
-        return Response(PlayerProfileSerializer(instance).data, status=status.HTTP_200_OK)
+        serializer.save()
+
+        player_data = serializer.data
+        send_qr_email(player_data.email, str(player_data.id))
+
+        return Response(status=status.HTTP_200_OK)
