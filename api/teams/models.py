@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 
+import uuid
 # Create your models here.
 
 class BaseModel(models.Model):
@@ -25,7 +26,10 @@ class PlayerProfile(BaseModel):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     date_of_birth = models.DateField()
     profile_photo = models.CharField(null=False, blank=False, max_length=200)
+
+    # Add related name
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    # public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
 
     @property
     def full_name(self):
