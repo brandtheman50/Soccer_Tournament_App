@@ -86,7 +86,7 @@ class AddTeamToLeague(APIView, IsLeagueAdmin):
         """
 
         data = request.data
-        serializer = TeamStandingCreateSerializer(data)
+        serializer = TeamStandingCreateSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=200)
