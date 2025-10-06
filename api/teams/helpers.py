@@ -31,7 +31,7 @@ def send_qr_email(to_email: str, payload: str):
 
     # 3) Render your HTML with the CID
     #    Your template file should be at: templates/emails/qr_email.html
-    html = render_to_string("templates/qr_code_email.html", {"qr_cid": qr_cid})
+    html = render_to_string("emails/qr_code_email.html", {"qr_cid": qr_cid})
     text = strip_tags(html)
 
     # 4) Build the email

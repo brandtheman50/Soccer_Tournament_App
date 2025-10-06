@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import *
+from django.db.models import Exists, OuterRef
 
 from league.models import League, TeamStanding
 
@@ -35,6 +36,8 @@ class PlayerProfileSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "date_of_birth",
+            "profile_photo",
             "team", # read-only view of the relation
             "team_id", # write-only input
         ]
@@ -45,6 +48,28 @@ class PlayerProfileSerializer(serializers.ModelSerializer):
                 message="This email is already registered in this team."
             )
         ]
+    
+    def validate(self, attrs):
+        email = attrs.get("email", getattr(self.instance, "email", None))
+        team  = attrs.get("team",  getattr(self.instance, "team",  None))
+
+        team_standing = TeamStanding.objects.get(team=team, league__status=League.ACTIVE)
+        league = team_standing.league
+
+        qs = PlayerProfile.objects.filter(email=email)
+
+        qs = qs.annotate(
+            in_league=Exists(
+                TeamStanding.objects.filter(
+                    league=league,
+                    team_id=OuterRef("team_id")
+                )
+            )
+        ).filter(in_league=True)
+
+        if qs.exists():
+            raise ValueError("Email already in use.")
+        return attrs
 
 class TeamMembershipSerializer(serializers.ModelSerializer):
     user = UserSerializerModel()

@@ -14,3 +14,9 @@ class TeamMembershipAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'team', 'role', 'status', 'joined_at', 'updated_at')
     search_fields = ['user__first_name', 'user__last_name', 'team__name', 'id']
     ordering = ('-id',)
+
+@admin.register(PlayerProfile)
+class PlayerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'first_name', 'last_name', 'email', 'date_of_birth', 'team')
+    search_fields = ['id', 'first_name', 'last_name', 'email', 'date_of_birth']
+    ordering = ('first_name', 'last_name', '-id')

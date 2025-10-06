@@ -16,6 +16,9 @@ class League(BaseModel):
     name = models.CharField(max_length=50)
     status = models.CharField(max_length=10)
 
+    def __str__(self):
+        return self.name
+
 class TeamStanding(BaseModel):
     team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="team_standings")
     league = models.ForeignKey(League, on_delete=models.PROTECT, related_name="standings")
