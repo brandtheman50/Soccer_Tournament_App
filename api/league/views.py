@@ -68,25 +68,23 @@ class CreateLeague(APIView, IsLeagueAdmin):
 class AddTeamToLeague(APIView, IsLeagueAdmin):
     def post(self, request):
         """
-        # Create a standing with an existing team:       
+        # Create a standing with an existing team or multiple:       
         {
-            "league_id": 3,
-            "team_id": 42
-        }
-
-        # Create a new team + standing
-        {
-            "league_id": 3,
-            "team_payload": {
-                "name": "Blue Tigers",
-                "logo_file_path": "/logos/blue_tigers.png",
-                "is_paid": true
-            }
+            league_id: 3,
+            teams: [1, 2, 3]
         }
         """
 
         data = request.data
-        serializer = TeamStandingCreateSerializer(data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        teams  = data.get("teams", [])
+
+        add_data = {
+            "league_id": data["league_id"],
+            "team_id": ""
+        }
+        for team in teams:
+            add_data["team_id"] = team
+            serializer = TeamStandingWriteSerializer(data=add_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         return Response(status=200)

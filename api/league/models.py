@@ -47,12 +47,24 @@ class TeamStanding(BaseModel):
             )
         ]
 
-
 class Match(BaseModel):
+    LEAGUE = "league"
+    QUARTER_FINAL = "quarter-final"
+    SEMI_FINAL = "semi-final"
+    FINAL = "final"
+    
+    MATCH_TYPES = (
+        (LEAGUE, "Leauge"),
+        (QUARTER_FINAL, "Quarter-final"),
+        (SEMI_FINAL, "Semi-final"),
+        (FINAL, "Final")
+    )
+
     league = models.ForeignKey(League, on_delete=models.PROTECT, related_name="matches")
     home_team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="home_matches")
     away_team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="away_matches")
     field_name = models.CharField(max_length=50)
+    match_type = models.CharField(choices=MATCH_TYPES, max_length=20)
     address = models.CharField(max_length=100)
     scheduled_date = models.DateTimeField()
     home_score = models.PositiveSmallIntegerField(null=True, blank=True)

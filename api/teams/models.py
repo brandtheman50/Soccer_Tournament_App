@@ -28,8 +28,8 @@ class PlayerProfile(BaseModel):
     profile_photo = models.CharField(null=False, blank=False, max_length=200)
 
     # Add related name
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    # public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="players")
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
 
     @property
     def full_name(self):
