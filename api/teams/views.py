@@ -9,7 +9,7 @@ from .helpers import send_qr_email
 from .serializers import *
 from .permissions import *
 
-class RegisterPlayer(APIView):
+class PlayerMethods(APIView):
     @transaction.atomic
     def post(self, request):
         data = request.data
@@ -24,3 +24,12 @@ class RegisterPlayer(APIView):
         send_qr_email(player_data.get("email"), str(player_data.get("id")))
 
         return Response(status=status.HTTP_200_OK)
+    
+    def get(self, request):
+        player_uuid = request.GET.get("player")
+
+        # Handle image url generation
+        player = PlayerProfile.objects.get(public_id=player_uuid)
+        serializer = PlayerProfileSerializer(player)
+        return Response(serializer.data)
+

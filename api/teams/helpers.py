@@ -51,3 +51,6 @@ def send_qr_email(to_email: str, payload: str):
 
     # 6) Send
     msg.send()
+
+def process_and_store(photo_data):
+    return

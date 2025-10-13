@@ -131,3 +131,6 @@ EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = "no-reply@example.test"
+
+MEDIAL_URL = "/media/"
+MEDIA_ROOT = f"{BASE_DIR}/media"
